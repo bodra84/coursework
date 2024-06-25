@@ -8,8 +8,9 @@
 - ansible (содержит плейбуки для конфигурации инфраструктуры).
 
 ### Развертывание инфраструктуры:
-До начала запуска необходимо создать yandex_cloud_token и прописать его в качестве переменной в файле terraform.tfvars.  
-Из папки terraform выполнить команды:
+До начала запуска необходимо создать yandex_cloud_token.
+Прописать токен в качестве переменной в файле terraform.tfvars. Файл разместить в папке terraform.
+Далее из папки terraform выполнить команды:
 ```sh
 terraform init
 terraform apply -target=module.vpc_up --auto-approve
