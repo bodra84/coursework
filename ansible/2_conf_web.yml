@@ -1,0 +1,69 @@
+---
+- name: Configure web server
+  hosts: internal_servers
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Update cache
+      apt:
+        update_cache: yes
+
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Copy index.html
+      copy:
+        src: templates/index.html
+        dest: /var/www/html/
+    
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
+    
+    - name: copy filebeat
+      copy:
+        src: packages/{{ pkg_name }}
+        dest: /tmp/
+
+    - name: Install filebeat deb
+      apt:
+        deb: "/tmp/{{ pkg_name }}"
+        state: present
+
+    - name: Copy filebeat.yml
+      template:
+        src: templates/filebeat.yml.j2
+        mode: 0644
+        dest: /etc/filebeat/filebeat.yml
+    
+    - name: Configure nginx module
+      copy:
+        dest: /etc/filebeat/modules.d/nginx.yml.disabled
+        content: |
+          - module: nginx
+            # Access logs
+            access:
+              enabled: true
+
+            # Error logs
+            error:
+              enabled: true
+        mode: 0644
+     
+    - name: Enable system nginx module in filebeat
+      shell:
+        cmd:  filebeat setup --dashboards && filebeat modules enable system nginx
+        
+    - name: Reload systemd daemon
+      shell:
+        cmd: systemctl daemon-reload
+    
+    - name: restart Filebeat
+      systemd:
+        name: filebeat.service
+        state: restarted
+        enabled: true
+...

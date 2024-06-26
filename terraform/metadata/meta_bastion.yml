@@ -1,0 +1,8 @@
+#cloud-config
+users:
+  - name: bastion
+    groups: sudo
+    shell: /bin/bash
+    sudo: 'ALL=(ALL) NOPASSWD:ALL'
+    ssh-authorized-keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJAZiMfLsrwEVg5dbB7JOkOu786UCM2rA3kCGVhBSGs1 davlat@ubuntuserver
